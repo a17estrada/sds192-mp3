@@ -1,0 +1,44 @@
+---
+title: "Mini Project 3"
+author: "Angelica Estrada & Natalia Kreciglowa"
+date: "11/17/2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Installing SQL:
+```{r}
+install.packages("mdsr")
+library(mdsr)
+db <- dbConnect_scidb(dbname = "imdb")
+```
+
+CLASS:
+```{r}
+class(db)
+```
+
+```{r}
+library(DBI)
+```
+
+# Get the Genre of Every Movie:
+```{r}
+db %>%
+  dbGetQuery("SELECT movie_id, info_type_id, info, id 
+              FROM movie_info
+              WHERE info_type_id = 3;")
+```
+
+
+```{r}
+db %>%
+  dbGetQuery("SELECT movie_id, info_type_id, info, id FROM movie_info
+              FROM movie_info
+              WHERE info_type_id = 16;")
+```
+
