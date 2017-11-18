@@ -34,7 +34,7 @@ genre <- db %>%
               WHERE info_type_id = 3;")
 save(genre, file = "genre.Rda")
 ```
-
+ 
 # Get the Release Date of Every Movie:
 ```{r}
 release <- db %>%
