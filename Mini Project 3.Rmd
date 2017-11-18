@@ -28,17 +28,23 @@ library(DBI)
 
 # Get the Genre of Every Movie:
 ```{r}
-db %>%
+genre <- db %>%
   dbGetQuery("SELECT movie_id, info_type_id, info, id 
               FROM movie_info
               WHERE info_type_id = 3;")
 ```
 
-
+# Get the Release Date of Every Movie:
 ```{r}
-db %>%
+release <- db %>%
   dbGetQuery("SELECT movie_id, info_type_id, info, id FROM movie_info
               FROM movie_info
               WHERE info_type_id = 16;")
 ```
 
+# Get the Title of Every Movie:
+```{r}
+title <- db %>%
+  dbGetQuery("SELECT id, title 
+             FROM title;")
+```
