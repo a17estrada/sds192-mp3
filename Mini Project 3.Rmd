@@ -26,30 +26,48 @@ class(db)
 library(DBI)
 ```
 
-# Get the Genre of Every Movie and Save Data:
 ```{r}
+# Get the Genre of Every Movie and Save Data:
 genre <- db %>%
   dbGetQuery("SELECT movie_id, info_type_id, info, id 
               FROM movie_info
               WHERE info_type_id = 3;")
 save(genre, file = "genre.Rda")
 ```
- 
-# Get the Release Date of Every Movie:
+
+
 ```{r}
+# Get the Release Date of Every Movie:
 release <- db %>%
-  dbGetQuery("SELECT movie_id, info_type_id, info, id FROM movie_info
+  dbGetQuery("SELECT movie_id, info_type_id, info, id 
               FROM movie_info
               WHERE info_type_id = 16;")
 save(release, file = "release.Rda")
 ```
 
-# Get the Title of Every Movie:
+
 ```{r}
+# Get the Title of Every Movie:
 title <- db %>%
   dbGetQuery("SELECT id, title 
              FROM title;")
 save(title, file = "title.Rda")
 ```
+
+
+```{r}
+# Rename Id in Title:
+title <- title %>%
+  rename( movie_id = id )
+```
+
+
+```{r}
+# Left join release date to title:
+release <- release %>%
+  left_join( title, by = c("movie_id"))
+```
+
+
 
 
