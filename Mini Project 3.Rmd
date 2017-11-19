@@ -359,17 +359,30 @@ genresplit[is.na(genresplit)] <- 0
 ```{r}
 # Mutate for proportion:
 genresplit <- genresplit %>%
-  mutate( genre1prop = totalgenre1 / totalmovies) %>%
-  mutate( genre2prop = totalgenre2 / totalmovies) %>%
-  mutate( genre3prop = totalgenre3 / totalmovies) %>%
-  mutate( genre4prop = totalgenre4 / totalmovies) %>%
-  mutate( genre5prop = totalgenre5 / totalmovies) %>%
-  mutate( genre6prop = totalgenre6 / totalmovies) %>%
-  mutate( genre7prop = totalgenre7 / totalmovies) %>%
-  mutate( genre8prop = totalgenre8 / totalmovies) %>%
-  mutate( genre9prop = totalgenre9 / totalmovies) 
+  mutate( Prop1Genre = totalgenre1 / totalmovies) %>%
+  mutate( Prop2Genre = totalgenre2 / totalmovies) %>%
+  mutate( Prop3Genre = totalgenre3 / totalmovies) %>%
+  mutate( Prop4Genre = totalgenre4 / totalmovies) %>%
+  mutate( Prop5Genre = totalgenre5 / totalmovies) %>%
+  mutate( Prop6Genre = totalgenre6 / totalmovies) %>%
+  mutate( Prop7Genre = totalgenre7 / totalmovies) %>%
+  mutate( Prop8Genre = totalgenre8 / totalmovies) %>%
+  mutate( Prop9Genre = totalgenre9 / totalmovies) 
 ```
 
+```{r}
+# Create clean data frame:
+library(reshape2)
+genresplitclean <- genresplit %>%
+  select(year, Prop1Genre, Prop2Genre, Prop3Genre, Prop4Genre, Prop5Genre, Prop6Genre, Prop7Genre, Prop8Genre, Prop9Genre) %>%
+  rename( Year = year )
+mgenresplitclean <- melt( genresplitclean, id = c("Year"))
+mgenresplitclean <- mgenresplitclean %>%
+  rename(GenreCount= variable) %>%
+  rename(Percent = value)
+ggplot(mgenresplitclean , aes( x= Year, Percent, fill = GenreCount)) +
+  geom_bar(position = "fill", stat = "identity") 
+```
 
 <!-- RESOURCES
 
