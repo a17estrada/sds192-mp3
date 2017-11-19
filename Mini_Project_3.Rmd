@@ -298,77 +298,33 @@ genresplit1 <- usamoviesdates %>%
   filter( genrecount == 1 ) %>%
   group_by( year ) %>%
   summarize( totalgenre1 = n()) 
-genresplit2 <- usamoviesdates %>% 
-  filter( genrecount == 2 ) %>%
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre2 = n()) 
-genresplit3 <- usamoviesdates %>% 
-  filter( genrecount == 3 ) %>%
+  summarize( totalgenre1 = n()) 
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre3 = n()) 
-genresplit4 <- usamoviesdates %>% 
-  filter( genrecount == 4 ) %>%
+  summarize( totalgenre1 = n()) 
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre4 = n()) 
-genresplit5 <- usamoviesdates %>% 
-  filter( genrecount == 5 ) %>%
+  summarize( totalgenre1 = n()) 
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre5 = n()) 
-genresplit6 <- usamoviesdates %>% 
-  filter( genrecount == 6 ) %>%
+  summarize( totalgenre1 = n()) 
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre6 = n()) 
-genresplit7 <- usamoviesdates %>% 
-  filter( genrecount == 7 ) %>%
+  summarize( totalgenre1 = n()) 
+genresplit1 <- usamoviesdates %>% 
+  filter( genrecount == 1 ) %>%
   group_by( year ) %>%
-  summarize( totalgenre7 = n()) 
-genresplit8 <- usamoviesdates %>% 
-  filter( genrecount == 8 ) %>%
-  group_by( year ) %>%
-  summarize( totalgenre8 = n()) 
-genresplit9 <- usamoviesdates %>% 
-  filter( genrecount == 9 ) %>%
-  group_by( year ) %>%
-  summarize( totalgenre9 = n()) 
-```
-
-```{r}
-# Join the different genre count data frames:
-genresplit <- genresplit %>%
-  full_join( genresplit1, by= "year")
-genresplit <- genresplit %>%
-  full_join( genresplit2, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit3, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit4, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit5, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit6, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit7, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit8, by= "year") 
-genresplit <- genresplit %>%
-  full_join( genresplit9, by= "year") 
-genresplit[is.na(genresplit)] <- 0
+  summarize( totalgenre1 = n()) 
 ```
 
 
-```{r}
-# Mutate for proportion:
-genresplit <- genresplit %>%
-  mutate( genre1prop = totalgenre1 / totalmovies) %>%
-  mutate( genre2prop = totalgenre2 / totalmovies) %>%
-  mutate( genre3prop = totalgenre3 / totalmovies) %>%
-  mutate( genre4prop = totalgenre4 / totalmovies) %>%
-  mutate( genre5prop = totalgenre5 / totalmovies) %>%
-  mutate( genre6prop = totalgenre6 / totalmovies) %>%
-  mutate( genre7prop = totalgenre7 / totalmovies) %>%
-  mutate( genre8prop = totalgenre8 / totalmovies) %>%
-  mutate( genre9prop = totalgenre9 / totalmovies) 
-```
 
 
 <!-- RESOURCES
