@@ -229,5 +229,10 @@ movies <- movies_df %>%
 Splitting a single column into multiple columns
 # https://stackoverflow.com/questions/7069076/split-column-at-delimiter-in-data-frame  (uses tidyr package)
 
+Convert to dates
+http://blog.yhat.com/static/pdf/R_date_cheat_sheet.pdf
+https://rpubs.com/davoodastaraky/lubridate
+https://www.statmethods.net/input/dates.html
+
 -->
 
