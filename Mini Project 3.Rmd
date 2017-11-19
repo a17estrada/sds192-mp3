@@ -4,39 +4,32 @@ author: "Angelica Estrada & Natalia Kreciglowa"
 date: "11/17/2017"
 output: html_document
 ---
-
+ 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-Installing SQL:
-```{r}
-install.packages("mdsr")
+#install.packages("mdsr")
 library(mdsr)
+library(lubridate) # for converting columns to `date` types
 db <- dbConnect_scidb(dbname = "imdb")
-```
-
-CLASS:
-```{r}
 class(db)
-```
-
-```{r}
 library(DBI)
+rename <- dplyr::rename
 ```
 
-```{r}
-# Get the Genre of Every Movie and Save Data:
+<!-- ***SQL QUERY*** -->
+
+```{r include=FALSE}
+# Get the Genre of Every Movie:
 genre <- db %>%
   dbGetQuery("SELECT movie_id, info_type_id, info, id 
               FROM movie_info
               WHERE info_type_id = 3;")
 # save(genre, file = "genre.Rda")
 ```
+ 
 
-
-```{r}
+```{r include=FALSE}
 # Get the Release Date of Every Movie:
 release <- db %>%
   dbGetQuery("SELECT movie_id, info_type_id, info, id 
@@ -46,7 +39,7 @@ release <- db %>%
 ```
 
 
-```{r}
+```{r include=FALSE}
 # Get the Title of Every Movie:
 title <- db %>%
   dbGetQuery("SELECT id, title 
@@ -54,21 +47,22 @@ title <- db %>%
 # save(title, file = "title.Rda")
 ```
 
+<!-- ***DATA CLEANING IN R*** -->
 
-```{r}
+```{r include=FALSE}
 # Rename Id in Title:
 title <- title %>%
   rename( movie_id = id )
 ```
 
 
-```{r}
+```{r include=FALSE}
 # Left join release date to title:
 release <- release %>%
-  left_join( title, by = c("movie_id"))
+  left_join( title, by = "movie_id")
 ```
 
-```{r}
+```{r include=FALSE}
 # test duplication deletion:
 library(dplyr)
 datetitle <- distinct(release, title, .keep_all = TRUE)
@@ -78,7 +72,7 @@ datetitle <- distinct(release, title, .keep_all = TRUE)
 #length(unique(datetitle$movie_id))
 ```
 
-```{r}
+```{r include=FALSE}
 # Count the number of genres per movie_id:
 genrecount <- genre %>%
   group_by( movie_id ) %>%
@@ -87,8 +81,153 @@ genrecount <- genre %>%
 # length(unique(genre$movie_id))
 ```
 
-```{r}
+```{r include=FALSE}
 # Join Date, Title and Genre Count information:
 movieinfo <- datetitle %>%
-  inner_join( genrecount, by = "movie_id" )
+  inner_join(genrecount, by = "movie_id" )
 ```
+
+<!-- Create `year` column by extracting year from existing data frame -->
+
+```{r include=FALSE}
+# Split `info` column into `country` and `date` 
+movieinfo <- movieinfo %>%
+  separate(col = info, 
+           into = c("country", "date"), 
+           sep = "\\:")
+
+# Formatting of values in `date` column (1 of 3 types):
+# 1. day month year
+# 2. month year
+# 3. year
+```
+    
+```{r include=FALSE}
+# Uses lubridate package
+
+# Create new date column in date format
+movieinfo <- movieinfo %>%
+  mutate(dates = dmy(date))
+
+# Values in the "day month year" were the only rows that were correctly parsed
+# Need to fix the remaining 231521 rows that failed to parse
+```
+
+<!-- Resolving year issue for values in "day month year" and "year" format -->
+
+```{r include=FALSE}
+# Convert `date` to numeric and save as a vector called `year`
+# as.numeric() will:
+#   1. Extract the "year" from `date` values in the "day month year" format and convert the character to numeric
+#   2. Convert values in the "year" format to numeric
+# Values in the "month year" format will be coded as NA but this will be fixed later
+
+yr <- as.numeric(movieinfo$date)
+```
+    
+```{r include=FALSE}
+### Code below just ensures that `yr` contains only years 
+### (skip this chunk but don't delete)
+
+# #count number of `NA`'s in `date`
+# sum(is.na(yr)) # 712118 NA's
+# 
+# #count number of years not including NA
+# length(yr)-sum(is.na(yr)) #147324 elements
+#  
+# # Create vector only containing year and no NA
+# yronly <- na.omit(yr) 
+# length(yronly) #147324 elements
+# 
+# # Check that all values in `yronly` are greater than 1800 (to make sure there are no days)
+# length(yronly > 1800) #147324 elements (matches!)
+```
+    
+
+```{r include=FALSE}
+# Add `yr` column to `movieinfo`
+movieinfo <- movieinfo %>%
+  mutate(yr = yr)
+
+# Split `date` column to `day`, `month`, `year` and while keeping `date` column
+
+d <- movieinfo$date
+
+movieinfo <- movieinfo %>%
+  separate(col = date,
+           into = c("day", "month", "year"),
+           sep = "\\ ")
+
+movieinfo <- movieinfo %>%
+  mutate(date=d)
+
+# Here we see that some `day` values are listed as a month, and some `month` values are listed as a year. This will be resolved in the code below.
+```
+
+```{r include=FALSE}
+# Convert `day` and `year` columns to numeric
+# Any `day` values containing a month or string will be coerced to NA
+movieinfo <- movieinfo %>%
+  mutate(day = as.numeric(day),
+         year = as.numeric(year))
+
+# Combine `yr` and `year` columns into `year` column
+movieinfo <- movieinfo %>%
+  mutate(year = ifelse(is.na(year) == TRUE, yr, year))
+```
+    
+<!-- Resolving year issue for values in "month year" format -->
+ 
+```{r include=FALSE}
+# Split `movieinfo` into 2 dataframes based on (non)missing years
+
+# First split: all movies with year
+yr <- movieinfo %>%
+  filter(!is.na(year))
+
+# Second split: all movies without year (year = NA)
+missing_yr <- movieinfo %>%
+  filter(is.na(year))
+
+# Check: Do the number of rows in `yr` and `missing_yr` add up to 859442? YES!
+ nrow(yr) + nrow(missing_yr)
+```
+    
+```{r include=FALSE}
+# Within `missing_yr`, we see that `month` column only contains the year and the `year` column has all NA's
+
+# Replace the NA's in `year` column by values in `month` column  
+missing_yr <- missing_yr %>%
+  mutate(year = month)
+```
+    
+```{r include=FALSE}
+# Combine both `yr` and `missing_yr` dataframes into a single dataframe called `movies_df` 
+movies_df <- rbind(yr, missing_yr)
+
+# Double check for any missing years? 0 missing years, we're good to go!
+sum(is.na(movies_df$year)) 
+```
+   
+<!-- ***CLEAN AND FINAL DATAFRAME TO USE: `movies`*** -->     
+     
+```{r include=FALSE}
+# Select relevant columns from `movies` and save as a clean & final dataframe: `movies` 
+# Only considering `year`
+
+movies <- movies_df %>%
+  select(movie_id, title, year, genrecount, country)
+
+```
+    
+ <!-- ***PLOTS*** -->
+ 
+ 
+  
+<!-- RESOURCES
+
+Splitting a single column into multiple columns
+# https://stackoverflow.com/questions/7069076/split-column-at-delimiter-in-data-frame  (uses tidyr package)
+
+-->
+
