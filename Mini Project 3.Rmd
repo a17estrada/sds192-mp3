@@ -15,6 +15,7 @@ db <- dbConnect_scidb(dbname = "imdb")
 class(db)
 library(DBI)
 rename <- dplyr::rename
+library(dplyr)
 ```
 
 <!-- ***SQL QUERY*** -->
@@ -221,55 +222,7 @@ movies <- movies_df %>%
 ```
     
 <!-- ***PLOTS*** -->
- 
 
-
-```{r}
-# Create Plot.ly:
-library(plotly)
-usmovieplot <- plot_ly(data = usamovies, x = ~year, y = ~genrecount,
-        marker = list(size = 10,
-                       color = 'rgba(255, 182, 193, .9)',
-                       line = list(color = 'rgba(152, 0, 0, .8)',
-                                   width = 2))) %>%
-  layout(title = 'Genre Count per Year',
-         yaxis = list(zeroline = FALSE),
-         xaxis = list(zeroline = FALSE))
-usmovieplot
-```
-
-
-
-```{r}
-usmoviedateplot <- plot_ly(data = usamoviesdates, x = ~year, y = ~genrecount,
-        marker = list(size = 10,
-                       color = 'skyblue',
-                       line = list(color = 'lightgrey',
-                                   width = 2))) %>%
-  layout(title = 'Genre Count per Year',
-         yaxis = list(zeroline = FALSE),
-         xaxis = list(zeroline = FALSE))
-usmoviedateplot
-```
-
-```{r}
-p <- ggplot(usmoviedateplot, aes(year, genrecount)) +
-  geom_point() + 
-  geom_jitter(width = 1, height = 1) + 
-  ggtitle("Genre Count per Movie")
-
-p <- ggplotly(p)
-
-p
-```
-
-
-```{r}
-ggplot(usmoviedateplot, aes(year, genrecount)) +
-  geom_point() + 
-  geom_jitter(width = 1, height = 1) + 
-  ggtitle("Genre Count per Movie")
-```
 
 ```{r}
 # Create data for US plots only:
@@ -359,30 +312,38 @@ genresplit[is.na(genresplit)] <- 0
 ```{r}
 # Mutate for proportion:
 genresplit <- genresplit %>%
-  mutate( Prop1Genre = totalgenre1 / totalmovies) %>%
-  mutate( Prop2Genre = totalgenre2 / totalmovies) %>%
-  mutate( Prop3Genre = totalgenre3 / totalmovies) %>%
-  mutate( Prop4Genre = totalgenre4 / totalmovies) %>%
-  mutate( Prop5Genre = totalgenre5 / totalmovies) %>%
-  mutate( Prop6Genre = totalgenre6 / totalmovies) %>%
-  mutate( Prop7Genre = totalgenre7 / totalmovies) %>%
-  mutate( Prop8Genre = totalgenre8 / totalmovies) %>%
-  mutate( Prop9Genre = totalgenre9 / totalmovies) 
+  mutate( "Proportion of Movies with 1 Genre" = totalgenre1 / totalmovies) %>%
+  mutate( "Proportion of Movies with 2 Genres" = totalgenre2 / totalmovies) %>%
+  mutate( "Proportion of Movies with 3 Genres" = totalgenre3 / totalmovies) %>%
+  mutate( "Proportion of Movies with 4 Genres" = totalgenre4 / totalmovies) %>%
+  mutate( "Proportion of Movies with 5 Genres"= totalgenre5 / totalmovies) %>%
+  mutate( "Proportion of Movies with 6 Genres" = totalgenre6 / totalmovies) %>%
+  mutate( "Proportion of Movies with 7 Genres"= totalgenre7 / totalmovies) %>%
+  mutate( "Proportion of Movies with 8 Genres" = totalgenre8 / totalmovies) %>%
+  mutate( "Proportion of Movies with 9 Genres" = totalgenre9 / totalmovies) 
 ```
 
 ```{r}
 # Create clean data frame:
 library(reshape2)
 genresplitclean <- genresplit %>%
-  select(year, Prop1Genre, Prop2Genre, Prop3Genre, Prop4Genre, Prop5Genre, Prop6Genre, Prop7Genre, Prop8Genre, Prop9Genre) %>%
+  select(year,  "Proportion of Movies with 1 Genre",  "Proportion of Movies with 2 Genres",  "Proportion of Movies with 3 Genres",  "Proportion of Movies with 4 Genres",  "Proportion of Movies with 5 Genres",  "Proportion of Movies with 6 Genres", "Proportion of Movies with 7 Genres",  "Proportion of Movies with 8 Genres",  "Proportion of Movies with 9 Genres") %>%
   rename( Year = year )
 mgenresplitclean <- melt( genresplitclean, id = c("Year"))
 mgenresplitclean <- mgenresplitclean %>%
   rename(GenreCount= variable) %>%
   rename(Percent = value)
-ggplot(mgenresplitclean , aes( x= Year, Percent, fill = GenreCount)) +
-  geom_bar(position = "fill", stat = "identity") 
+p <- ggplot(mgenresplitclean , aes( x= Year, Percent, fill = GenreCount)) +
+    geom_bar(position = "fill", stat = "identity") +
+    scale_fill_brewer(palette="YlGnBu", name="Number of Genres per Movie") +
+    theme(panel.border = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_rect(fill = "white"))
+p <- ggplotly(p)
+p
 ```
+
 
 <!-- RESOURCES
 
