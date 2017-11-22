@@ -355,6 +355,7 @@ p
 
 
 ### A Few Observations: 
+
 There are **no dramatic increase** to the number of genres films had post-1947! More notable is the fact that movies with only ONE genre were made at a higher proportion of the total movies released. Perhaps this shows the effects of this Supreme Court Case: studios could no longer "control/buy-out" one genre, by hiring all the horror writers, producers and directors in house. Instead of limiting a single genre to one movie studio who contracted all the genre-specific talent, the movie industry professionals were free to move around, and produce movies in that specific genre accross many different studios. 
 
 <!-- RESOURCES
